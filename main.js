@@ -1,13 +1,18 @@
 const PLAYFIELD_COLUMNS = 10;
 const PLAYFIELD_ROWS = 20;
 
-const TETROMINO_NAMES = ["O"]; // список фігур
+const TETROMINO_NAMES = ["O", "L"]; // список фігур
 
 const TETROMINOES = {
   // опис як виглядають наші фігури
   O: [
     [1, 1],
     [1, 1],
+  ],
+  L: [
+    [0, 0, 1],
+    [1, 1, 1],
+    [0, 0, 0],
   ],
 };
 
@@ -33,7 +38,7 @@ function generatePlayField() {
 function generateTetromino() {
   // ф-ція опис фігури
   // 1) маємо розуміти яка в нас фігура
-  const nameTetro = "O";
+  const nameTetro = "L";
   // 2) маємо розуміти пропорції фігури
   const matrixTetro = TETROMINOES[nameTetro];
   // 3) маємо знати в якій колонці маємо малювати
@@ -54,6 +59,21 @@ generateTetromino();
 
 const cells = document.querySelectorAll(".tetris div");
 
+// Відмалювання фігур на полі
+
+function drawPlayField() {
+  for (let row = 0; row < PLAYFIELD_ROWS; row += 1) {
+    for (let column = 0; column < PLAYFIELD_COLUMNS; column += 1) {
+      // if (playField[row][column] === 0) {
+      //   continue;
+      // }
+      const name = playField[row][column];
+      const cellIndex = convertPositionToIndex(row, column);
+      cells[cellIndex].classList.add(name);
+    }
+  }
+}
+
 function drawTetramino() {
   // відмальовуємо фігуру
   const name = tetromino.name;
@@ -61,6 +81,9 @@ function drawTetramino() {
 
   for (let row = 0; row < tetrominoMatrixSize; row += 1) {
     for (let column = 0; column < tetrominoMatrixSize; column += 1) {
+      if (tetromino.matrix[row][column] === 0) {
+        continue;
+      }
       const cellIndex = convertPositionToIndex(
         tetromino.row + row,
         tetromino.column + column
@@ -76,6 +99,7 @@ function draw() {
   cells.forEach(function (cell) {
     cell.removeAttribute("class");
   });
+  drawPlayField();
   drawTetramino();
 }
 
@@ -122,6 +146,9 @@ function isOutSideOfGameBoard() {
   const matrixSize = tetromino.matrix.length;
   for (let row = 0; row < matrixSize; row += 1) {
     for (let column = 0; column < matrixSize; column += 1) {
+      if (!tetromino.matrix[row][column]) {
+        continue;
+      }
       if (
         tetromino.column + column < 0 ||
         tetromino.column + column >= PLAYFIELD_COLUMNS ||
@@ -142,7 +169,8 @@ function placeTetromino() {
     for (let column = 0; column < matrixSize; column += 1) {
       if (!tetromino.matrix[row][column]) continue;
 
-      //   playField[tetromino.row + row][tetromino.column + column] = tetromino.;
+      playField[tetromino.row + row][tetromino.column + column] =
+        TETROMINO_NAMES[0];
     }
   }
   generateTetromino();
