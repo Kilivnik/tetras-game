@@ -1,7 +1,7 @@
 const PLAYFIELD_COLUMNS = 10;
 const PLAYFIELD_ROWS = 20;
 
-const TETROMINO_NAMES = ["O", "L"]; // список фігур
+const TETROMINO_NAMES = ["O", "L", "I", "T", "J", "S", "Z"]; // список фігур
 
 const TETROMINOES = {
   // опис як виглядають наші фігури
@@ -12,6 +12,32 @@ const TETROMINOES = {
   L: [
     [0, 0, 1],
     [1, 1, 1],
+    [0, 0, 0],
+  ],
+  I: [
+    [0, 0, 0, 0],
+    [1, 1, 1, 1],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+  ],
+  T: [
+    [0, 0, 0],
+    [0, 1, 0],
+    [1, 1, 1],
+  ],
+  J: [
+    [0, 0, 1],
+    [1, 1, 1],
+    [0, 0, 0],
+  ],
+  S: [
+    [0, 1, 1],
+    [1, 1, 0],
+    [0, 0, 0],
+  ],
+  Z: [
+    [1, 1, 0],
+    [0, 1, 1],
     [0, 0, 0],
   ],
 };
@@ -35,22 +61,40 @@ function generatePlayField() {
     .map(() => new Array(PLAYFIELD_COLUMNS).fill(0));
 }
 
+// генеруєм рандомний колір фігури
+function randomGenerator(from, to) {
+  return Math.floor(Math.random() * (to - from) + from);
+}
+
+function randomColor() {
+  const r = randomGenerator(0, 256);
+  const g = randomGenerator(0, 256);
+  const b = randomGenerator(0, 256);
+  const rgb = `rgb(${r}, ${g}, ${b})`;
+  return rgb;
+}
+
 function generateTetromino() {
   // ф-ція опис фігури
-  // 1) маємо розуміти яка в нас фігура
-  const nameTetro = "L";
+
+  // 1) рандомний вибір фігури
+  const nameTetro =
+    TETROMINO_NAMES[Math.floor(Math.random() * TETROMINO_NAMES.length)];
+
   // 2) маємо розуміти пропорції фігури
   const matrixTetro = TETROMINOES[nameTetro];
-  // 3) маємо знати в якій колонці маємо малювати
 
-  const columnTetro = 4;
-  const rowTetro = 3;
+  // 3) визначаємо центр поля для відмалювання фігури
+  const columnTetro = Math.floor((PLAYFIELD_COLUMNS - matrixTetro.length) / 2);
+  const rowTetro = 2;
+  const colorTetro = randomColor();
 
   tetromino = {
     name: nameTetro,
     matrix: matrixTetro,
     row: rowTetro,
     column: columnTetro,
+    color: colorTetro,
   };
 }
 
@@ -76,6 +120,7 @@ function drawPlayField() {
 
 function drawTetramino() {
   // відмальовуємо фігуру
+  const color = tetromino.color;
   const name = tetromino.name;
   const tetrominoMatrixSize = tetromino.matrix.length;
 
@@ -89,6 +134,7 @@ function drawTetramino() {
         tetromino.column + column
       );
       cells[cellIndex].classList.add(name);
+      cells[cellIndex].style.setProperty("--color-tetramino", color);
     }
   }
 }
@@ -170,7 +216,7 @@ function placeTetromino() {
       if (!tetromino.matrix[row][column]) continue;
 
       playField[tetromino.row + row][tetromino.column + column] =
-        TETROMINO_NAMES[0];
+        tetromino.name;
     }
   }
   generateTetromino();
